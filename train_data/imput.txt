@@ -1,0 +1,196 @@
+#include<stdio.h>                                                
+#include<string.h>                                               
+int main(){                                                      
+	int n,i,j;                                               
+	scanf("%d",&n);                                          
+    int a[1000];                                                  
+    for(i=0; i<n; i++){                                          
+		scanf("%d",&a[i]);                               
+	}                                                        
+	for(i=0; i<n; i++){                                      
+        int number = 0;                                          
+		for(j=0; j<=i; j++){                             
+			if(a[i] == a[j]){                        
+				number++                         
+			}		                         
+		}                                                
+		printf("%d ",number);	                         
+    }                                                              
+     return 0;	                                                 
+}                                                                
+#include<stdio.h>                                                
+#include<string.h>                                               
+#define N 10000                                                  
+int main(){                                                      
+	int n;                                                   
+	scanf("%d",&n);                                          
+	int a[N+1];                                              
+	memset(a,0,sizeof(a));                                   
+	int i,j;                                                 
+	for(i=0;i<n;i++){                                        
+		scanf("%d",&a[i]);                                
+	}                                                        
+	int number = 0;                                          
+	for(i=0;i<n;i++){                                        
+		for(j=i+1;j<n;j++){                              
+			if(a[i]-a[j] == 1 || a[j]-a[i] == 1){    
+				number++;                        
+			}                                        
+		}	                                         
+	}                                                        
+		printf("%d",number);                             
+	   return 0;                                             
+}                                                                
+#include<stdio.h>                                                
+#include<string.h>                                               
+#define N 100                                                    
+int main(){                                                      
+	char str[N];                                                
+	int i;                                                   
+	for(i=0; i<N;i++){                                       
+		scanf("%s",str);                                 
+	}                                                        
+    int a;                                                       
+    scanf("%d",a);                                               
+    while(a==0){                                                 
+    	for(i=0; i<N; i++){                                      
+    			if(str[i] != '\0'){                      
+    		        str[i] ^= 32;	                         
+		}                                                
+	}                                                        
+}                                                                
+	int n,j;                                                 
+	scanf("%d",n);                                            
+	char STR[100][100] ;                                     
+	for(i=0; i<n; i++){                                      
+		for(j=0; j<N; j++){                              
+			scanf("%s\n",&STR[I][j]);                
+		}                                                
+	}                                                        
+	int k;                                                   
+	for(i=0; i<n; i++){                                      
+		for(j=0; j<N; j++){                              
+			for(k=0; k<strlen(str); k++){            
+				STR[i][j] = str[k];	         
+			}                                        
+			printf("%s\n",STR[i][j]);                
+		}                                                
+	}                                                        	
+}                                                                
+#include<stdio.h>                                                
+#include<stdlib.h>                                               
+#define RIGHT 1                                                   
+#define DOWN 2                                                   
+#define LEFTDOWN 3                                               
+#define RIGHTUP 4                                                 
+int main()                                                       
+{                                                                
+    int row,col;                                                   
+    int n=0;                                                     
+    int **array;                                                 
+    scanf("%d",&n);                                              
+    if(n<1 || n>500)                                             
+    {                                                            
+        return 0;                                                
+    }                                                            
+    array=(int**)malloc(sizeof(int*)*(n+1));                     
+    int i;                                                       
+    for(i=1;i<=n;i++)                                            
+    {                                                            
+        array[i]=(int*)malloc(sizeof(int)*(n+1));                
+    }                                                            
+    for(row=1;row<=n;row++)                                      
+    {                                                            
+        for(col=1;col<=n;col++)                                  
+        {                                                        
+            scanf("%d",&array[row][col]);                        
+            if(array[row][col]<0 || array[row][col]>1000)        
+            {                                                    
+                return 0;                                        
+            }                                                    
+        }                                                        
+    }                                                            
+    row=1;                                                       
+    col=1;                                                       
+    int direction=0;                                             
+    int *resultArray;                                            
+    resultArray=(int*)malloc(sizeof(int)*n*n);                   
+    int a;                                                       
+    resultArray[0]=array[row][col];                              
+    for(a=1;a<n*n && !(row==n && col==n);a++)                    
+    {                                                            
+        if(direction==0){                                        
+            direction=RIGHT;                                     
+        }                                                        
+        else if(direction==RIGHT) {                              
+            if(row+1<=n && col-1>=1){                            
+                direction=LEFTDOWN;                              
+            }                                                    
+            else{                                                
+                direction=RIGHTUP;                               
+            }                                                    
+        }                                                        
+        else if(direction==LEFTDOWN){                            
+            if(row+1<=n && col-1>=1){                            
+                direction=LEFTDOWN;                              
+            }                                                    
+            else if(row+1<=n){                                   
+                direction=DOWN;                                  
+            }                                                    
+            else{                                                
+                direction=RIGHT;                                 
+            }                                                     
+        }                                                        
+        else if(direction==RIGHTUP){                             
+            if(row-1>=1 && col+1<=n){                            
+                direction=RIGHTUP;                               
+            }                                                    
+            else if(col+1<=n){                                   
+                direction=RIGHT;                                 
+            }                                                    
+            else{                                                
+                direction=DOWN;                                  
+            }                                                    
+        }                                                        
+        else{                                                    
+            if(row+1<=n && col-1>=1) {                           
+                direction=LEFTDOWN;                              
+            }                                                    
+            else{                                                
+                direction=RIGHTUP;                               
+            }                                                    
+        }                                                        
+        if(direction==RIGHT) {                                   
+            ++col;                                               
+        }                                                        
+        else if(direction==DOWN) {                               
+            ++row;                                               
+        }                                                        
+        else if(direction==LEFTDOWN){                            
+            ++row;                                               
+            --col;                                               
+        }                                                        
+        else {                                                   
+            --row;                                               
+            ++col;                                               
+        }                                                        
+        resultArray[a]=array[row][col];                          
+    }                                                            
+    for(a=0;a<n*n;a++){                                          
+        printf("%d ",resultArray[a]);                            
+    }                                                            
+    free(resultArray);                                           
+    int j;                                                       
+    for(j=1;j<=n;j++){                                           
+        free(array[j]);                                          
+    }                                                            
+    free(array);                                                 
+    return 0;                                                    
+}                                                                
+
+	
+	
+	
+    	
+
+

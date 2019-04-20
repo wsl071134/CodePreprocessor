@@ -1,3 +1,5 @@
+					#测试提取代码中的关键字，方法名等的程序
+
 import pandas as pd
 import numpy as np
 import re
@@ -8,7 +10,7 @@ pattern_list=[]
 for x in pattern_str_list:
 	pattern=re.compile(r''+x[0]+'')
 	pattern_list.append(pattern)
-df = pd.read_csv('test.txt', sep='\n',header=None)
+df = pd.read_csv('train_data/test_code.txt', sep='\n',header=None)
 data_all = np.array(df).astype(str)
 data=[]
 for x in np.nditer(data_all):
