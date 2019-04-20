@@ -45,7 +45,7 @@ def init_input(df):
 	X=X/len(keyword_list)
 	return X
 
-#处理加载的输出数据，返回归一化后的数值矩阵
+#处理加载的输出数据
 def init_output(df):
 	Y = np.array(df).astype(int)
 	return Y
