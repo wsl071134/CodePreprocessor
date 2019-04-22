@@ -21,6 +21,6 @@ code_to_int,int_to_code = du.load_keyword_dict(kw_list,variables_list)
 #print(code_to_int)
 #测试矩阵转换，基本通过，有些特殊情况尚待解决。如还原后的代码可读性不好等等
 X = du.init_input(in_data,code_to_int,int_to_code)
-print(X)
+#print(X)
 
 

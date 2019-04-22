@@ -55,9 +55,10 @@ def load_output(filename):
 #初始化输入矩阵
 def init_input(in_data,code_to_int,int_to_code):
 	temp = []
-	pattern = re.compile(r'([\W]+)')
+	pattern = re.compile(r'([\W]{1,2})')
 	for x in in_data:
 		data = re.split(pattern,x)
+#		print(data)
 		temp0=[]
 		for y in data:
 			if len(y) == 0:
@@ -65,21 +66,30 @@ def init_input(in_data,code_to_int,int_to_code):
 			try:
 				temp0.append(code_to_int[y])
 			except KeyError:
-				temp0.append(-1)
+				y=re.compile(r'([\W]+)').findall(y)
+#				print(y)
+				if len(y) == 0:
+					continue
+				for c in y[0]:
+					try:
+						temp0.append(code_to_int[c])
+					except KeyError:
+						temp0.append(-1)
 		if len(temp0)!=200:
 			for i in range(200-len(temp0)-1):
 				temp0.append(-1)
 		temp.append(temp0)
 	temp=np.array(temp).astype(int)
 	'''
+	看看还原后的代码：'''
 	print(temp)
 	for x in temp:
 		code_str=[]
 		for value in x:
 			if value!=-1:
 				code_str.append(int_to_code[value])
-		print(code_str)
-	'''
+		print(' '.join(code_str))
+	''''''
 	X=np.reshape(temp,(len(temp),temp.shape[1],1))
 	X=X/len(code_to_int)
 	return X

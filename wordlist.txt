@@ -1,3 +1,4 @@
+include
 bool
 char
 int
@@ -67,3 +68,12 @@ if
 else
 switch
 case
+return
+(
+)
+[
+]
+{
+}
+,
+;
