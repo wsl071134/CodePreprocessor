@@ -12,7 +12,7 @@ import pandas as pd
 
 '''
 =================================================================================================
-#					变量名参考表						#
+#					主要变量名参考表					#
 =================================================================================================
 #  str_list	——	字符串列表		in_data		——	输入数据的字符串表示	#
 #  out_data	—— 	输出数据的原始表示	kw_list		——	关键词列表 		#
@@ -48,7 +48,7 @@ def load_pattern(filename):
 
 #加载输出文件
 def load_output(filename):
-	df = pd.read_csv(filename,sep='\n')
+	df = pd.read_csv(filename,sep='\n',header = None)
 	out_data = np.array(df).astype(int)
 	return out_data
 
@@ -81,7 +81,7 @@ def init_input(in_data,code_to_int,int_to_code):
 		temp.append(temp0)
 	temp=np.array(temp).astype(int)
 	'''
-	看看还原后的代码：'''
+	看看还原后的代码：
 	print(temp)
 	for x in temp:
 		code_str=[]
@@ -89,7 +89,7 @@ def init_input(in_data,code_to_int,int_to_code):
 			if value!=-1:
 				code_str.append(int_to_code[value])
 		print(' '.join(code_str))
-	''''''
+	'''
 	X=np.reshape(temp,(len(temp),temp.shape[1],1))
 	X=X/len(code_to_int)
 	return X

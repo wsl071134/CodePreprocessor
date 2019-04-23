@@ -65,7 +65,7 @@ def build_model():
 def train_model(train_x,train_y,test_x,test_y):
 	model = build_model()
 	try:
-		model.fit(train_x, train_y, batch_size=512, nb_epoch=500, validation_split=0.1)
+		model.fit(train_x, train_y, batch_size=512, nb_epoch=372, validation_split=0.1)
 		predict = model.predict(test_x)
 		predict = np.reshape(predict, (predict.size, ))
 
