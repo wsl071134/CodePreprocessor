@@ -8,9 +8,9 @@ def build_model(input_shape1):
 	model.add(LSTM(input_shape=(input_shape1, 1), units=50, return_sequences=True))
 	print(model.layers)
 	model.add(LSTM(100, return_sequences=False))
-	model.add(Dense(output_dim=2))
-	model.add(Activation('linear'))
-	model.compile(loss = 'categorical_crossentropy', optimizer = 'adam',metrics=['accuracy'])
+	model.add(Dense(output_dim=1))
+	model.add(Activation('relu'))
+	model.compile(loss = 'mse', optimizer = 'adam')
 	return model
 
 #训练模型
@@ -23,6 +23,6 @@ def train_model(train_x,train_y,test_x,test_y,model):
 	except KeyboardInterrupt:
 		print(predict)
 		print(test_y)
-	print(predict)
-	print(test_y)
+#	print(predict)
+#	print(test_y)
 	return predict, test_y

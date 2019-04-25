@@ -3,7 +3,7 @@
 import re
 
 pattern=re.compile(r'([\W]+)')
-data=re.split(pattern,'int main(bool a,float b,double c)')
+data=re.split(pattern,'if(array[row][col]<0 || array[row][col]>1000)       ')
 print(data)
 #此处可从文件读
 keyword_list=['bool','float','double','int','main']

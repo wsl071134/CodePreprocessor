@@ -81,7 +81,7 @@ def init_input(in_data,code_to_int,int_to_code):
 		temp.append(temp0)
 	temp=np.array(temp).astype(int)
 	'''
-	看看还原后的代码：
+	看看还原后的代码：'''
 	print(temp)
 	for x in temp:
 		code_str=[]
@@ -89,7 +89,7 @@ def init_input(in_data,code_to_int,int_to_code):
 			if value!=-1:
 				code_str.append(int_to_code[value])
 		print(' '.join(code_str))
-	'''
+	''''''
 	X=np.reshape(temp,(len(temp),temp.shape[1],1))
 	X=X/len(code_to_int)
 	return X

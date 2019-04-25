@@ -37,7 +37,7 @@ X=np.reshape(dataX,(len(dataX),code_line_len,1))
 #print(X)
 #将X归一化
 X=X/float(len(keyword_list))
-#print(X)
+print(X)
 #将dataY向量化
 Y=np_utils.to_categorical(dataY)
 #print(Y)
