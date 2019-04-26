@@ -3,18 +3,18 @@
 int main(){                                                      
 	int n,i,j;                                               
 	scanf("%d",&n);                                          
-	int a[1000];                                                  
-	for(i=0; i<n; i++){                                          
+    int a[1000];                                                  
+    for(i=0; i<n; i++){                                          
 		scanf("%d",&a[i]);                               
-	}                                                       
+	}                                                        
 	for(i=0; i<n; i++){                                      
-		int number = 0;                                          
+        int number = 0;                                          
 		for(j=0; j<=i; j++){                             
-			if(a[i+1] == a[j]){                        
-				number++;                         
+			if(a[i] == a[j]){                        
+				number++                         
 			}		                         
 		}                                                
 		printf("%d ",number);	                         
-	}                                                              
-	return 0;	                                                 
-}
+    }                                                              
+     return 0;	                                                 
+} 

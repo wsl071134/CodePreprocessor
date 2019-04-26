@@ -74,14 +74,15 @@ def init_input(in_data,code_to_int,int_to_code):
 					try:
 						temp0.append(code_to_int[c])
 					except KeyError:
-						temp0.append(-1)
+						temp0.append(0)
 		if len(temp0)!=200:
 			for i in range(200-len(temp0)-1):
-				temp0.append(-1)
+				temp0.append(0)
 		temp.append(temp0)
 	temp=np.array(temp).astype(int)
 	'''
-	看看还原后的代码：'''
+	看看还原后的代码：
+	print("===temp===")
 	print(temp)
 	for x in temp:
 		code_str=[]
@@ -89,14 +90,67 @@ def init_input(in_data,code_to_int,int_to_code):
 			if value!=-1:
 				code_str.append(int_to_code[value])
 		print(' '.join(code_str))
-	''''''
+	'''
 	X=np.reshape(temp,(len(temp),temp.shape[1],1))
 	X=X/len(code_to_int)
 	return X
 
+#每group_size行做一个输入,最后补齐空行
+def init_input_ByGroup(in_data,code_to_int,int_to_code,group_size):
+	temp = []
+	pattern = re.compile(r'([\W]{1,2})')
+	for x in in_data:
+		data = re.split(pattern,x)
+#		print(data)
+		temp0=[]
+		for y in data:
+			if len(y) == 0:
+				continue
+			try:
+				temp0.append(code_to_int[y])
+			except KeyError:
+				y=re.compile(r'([\W]+)').findall(y)
+#				print(y)
+				if len(y) == 0:
+					continue
+				for c in y[0]:
+					try:
+						temp0.append(code_to_int[c])
+					except KeyError:
+						temp0.append(0)
+		if len(temp0)!=200:
+			for i in range(200-len(temp0)):
+				temp0.append(0)
+		temp.append(temp0)
+	for i in range(group_size):
+		temp0=[]
+		for j in range(200):
+			temp0.append(0)
+		temp.append(temp0)
+	temp=np.array(temp).astype(int)
+	X=[]
+	for i in range(0,len(temp)-group_size,1):
+		X.append(temp[i:i+group_size])
+	X=np.array(X).astype(int)
+	X=np.reshape(X,(len(X),X.shape[1],200))
+	X=X/len(code_to_int)
+#	print(X)
+	return X
 #初始化输出矩阵
 def init_output(out_data):
-	Y=out_data
+	Y=np.reshape(out_data,(len(out_data),1))
+	return Y
+#每group_size行做一个输出,最后补齐空行
+def init_output_ByGroup(out_data,group_size):
+	out_data=out_data.tolist()
+	for i in range(group_size):
+		out_data.append([-1])
+	Y=[]
+	for i in range(0,len(out_data)-group_size,1):
+		Y.append(out_data[i:i+group_size])
+#	print(Y)
+	Y = np.array(Y).astype(int)
+	Y=np.reshape(Y,(len(Y),Y.shape[1],1))
 	return Y
 
 #提取变量及方法名列表
@@ -113,13 +167,13 @@ def get_variables(pattern_list,in_data):
 	variables_list.sort(key = temp.index)
 	return variables_list
 
-#生成转换字典
+#生成转换字典，从1编号
 def load_keyword_dict(kw_list,variables_list):
 	for x in variables_list:
 		kw_list.append(x)
 	kw_list = list(set(kw_list))
-	code_to_int = dict((c,i) for i,c in enumerate(kw_list))
-	int_to_code = dict((i,c) for i,c in enumerate(kw_list))
+	code_to_int = dict((c,i+1) for i,c in enumerate(kw_list))
+	int_to_code = dict((i+1,c) for i,c in enumerate(kw_list))
 	return code_to_int,int_to_code
 
 #加载训练数据
