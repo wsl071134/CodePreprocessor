@@ -9,4 +9,3 @@
 (?#匹配double型变量)(?<=double )+?\w+|(?<=double\* )+?\w+|(?<=double\*\* )+?\w+|(?<=double \*)+?\w+|(?<=double \*\*)+?\w+
 (?#匹配enum型变量)(?<=enum )+?\w+|(?<=enum\* )+?\w+|(?<=enum\*\* )+?\w+|(?<=enum \*)+?\w+|(?<=enum \*\*)+?\w+
 (?#匹配bool型变量)(?<=bool )+?\w+|(?<=bool\* )+?\w+|(?<=bool\*\* )+?\w+|(?<=bool \*)+?\w+|(?<=bool \*\*)+?\w+
-

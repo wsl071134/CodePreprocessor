@@ -1,206 +1,208 @@
-#encodeing=utf-8
-
+# encoding=utf-8
 import re
-import os
 import numpy as np
 import pandas as pd
+import collections as col
 
 
-#Author:	WangShiling
-#Date:		2019-04-20 17:50
-#Describe:	数据加载工具类，提供各种数据处理函数
-
-'''
-=================================================================================================
-#					主要变量名参考表					#
-=================================================================================================
-#  str_list	——	字符串列表		in_data		——	输入数据的字符串表示	#
-#  out_data	—— 	输出数据的原始表示	kw_list		——	关键词列表 		#
-#  pattern_list	——	正则列表		variables_list	——	程序变量及方法名列表	#
-#  Y		——	输出数据的矩阵表示	X		——	输入数据的数字矩阵表示	#
-#  code_to_int	——	关键字对照字典		int_to_code	——	关键字对照字典		#
-#  train_x	——	训练集输入数据		train_y		——	训练集输出数据		#
-#  test_x	——	测试集输入数据		test_y		——	测试集输出数据		#
-==================================================================================================
-'''
-
-#从文件加载字符串列表
-def load_str_list(filename):
-	'''
-	以下功能均可由本方法实现：
-	#加载输入文件		def load_input(filename)
-	#加载关键字对照表	def load_kw_list(filename)
-	'''
-	df = pd.read_csv(filename,sep='\n',header = None)
-	temp = np.array(df).astype(str)
-	str_list = []
-	for x in temp:
-		str_list.append(x[0].strip())
-	return str_list
-
-def load_pattern(filename):
-	temp = load_str_list(filename)
-	pattern_list=[]
-	for x in temp:
-		pattern = re.compile(r''+x+'')
-		pattern_list.append(pattern)
-	return pattern_list	
-
-#加载输出文件
-def load_output(filename):
-	df = pd.read_csv(filename,sep='\n',header = None)
-	out_data = np.array(df).astype(int)
-	return out_data
-
-#初始化输入矩阵
-def init_input(in_data,code_to_int,int_to_code):
-	temp = []
-	pattern = re.compile(r'([\W]{1,2})')
-	for x in in_data:
-		data = re.split(pattern,x)
-#		print(data)
-		temp0=[]
-		for y in data:
-			if len(y) == 0:
-				continue
-			try:
-				temp0.append(code_to_int[y])
-			except KeyError:
-				y=re.compile(r'([\W]+)').findall(y)
-#				print(y)
-				if len(y) == 0:
-					continue
-				for c in y[0]:
-					try:
-						temp0.append(code_to_int[c])
-					except KeyError:
-						temp0.append(0)
-		if len(temp0)!=200:
-			for i in range(200-len(temp0)-1):
-				temp0.append(0)
-		temp.append(temp0)
-	temp=np.array(temp).astype(int)
-	'''
-	看看还原后的代码：
-	print("===temp===")
-	print(temp)
-	for x in temp:
-		code_str=[]
-		for value in x:
-			if value!=-1:
-				code_str.append(int_to_code[value])
-		print(' '.join(code_str))
-	'''
-	X=np.reshape(temp,(len(temp),temp.shape[1],1))
-	X=X/len(code_to_int)
-	return X
-
-#每group_size行做一个输入,最后补齐空行
-def init_input_ByGroup(in_data,code_to_int,int_to_code,group_size):
-	temp = []
-	pattern = re.compile(r'([\W]{1,2})')
-	for x in in_data:
-		data = re.split(pattern,x)
-#		print(data)
-		temp0=[]
-		for y in data:
-			if len(y) == 0:
-				continue
-			try:
-				temp0.append(code_to_int[y])
-			except KeyError:
-				y=re.compile(r'([\W]+)').findall(y)
-#				print(y)
-				if len(y) == 0:
-					continue
-				for c in y[0]:
-					try:
-						temp0.append(code_to_int[c])
-					except KeyError:
-						temp0.append(0)
-		if len(temp0)!=200:
-			for i in range(200-len(temp0)):
-				temp0.append(0)
-		temp.append(temp0)
-	for i in range(group_size):
-		temp0=[]
-		for j in range(200):
-			temp0.append(0)
-		temp.append(temp0)
-	temp=np.array(temp).astype(int)
-	X=[]
-	for i in range(0,len(temp)-group_size,1):
-		X.append(temp[i:i+group_size])
-	X=np.array(X).astype(int)
-	X=np.reshape(X,(len(X),X.shape[1],200))
-	X=X/len(code_to_int)
-#	print(X)
-	return X
-#初始化输出矩阵
-def init_output(out_data):
-	Y=np.reshape(out_data,(len(out_data),1))
-	return Y
-#每group_size行做一个输出,最后补齐空行
-def init_output_ByGroup(out_data,group_size):
-	out_data=out_data.tolist()
-	for i in range(group_size):
-		out_data.append([-1])
-	Y=[]
-	for i in range(0,len(out_data)-group_size,1):
-		Y.append(out_data[i:i+group_size])
-#	print(Y)
-	Y = np.array(Y).astype(int)
-	Y=np.reshape(Y,(len(Y),Y.shape[1],1))
-	return Y
-
-#提取变量及方法名列表
-def get_variables(pattern_list,in_data):
-	variables_list = []
-	temp = []
-	for x in in_data:
-		for y in pattern_list:
-			result = y.findall(str(x))
-			if result:
-				for z in result:
-					temp.append(z)
-	variables_list = list(set(temp))
-	variables_list.sort(key = temp.index)
-	return variables_list
-
-#生成转换字典，从1编号
-def load_keyword_dict(kw_list,variables_list):
-	for x in variables_list:
-		kw_list.append(x)
-	kw_list = list(set(kw_list))
-	code_to_int = dict((c,i+1) for i,c in enumerate(kw_list))
-	int_to_code = dict((i+1,c) for i,c in enumerate(kw_list))
-	return code_to_int,int_to_code
-
-#加载训练数据
-def load_train_data(X,Y,split):
-	split_boundary = int(X.shape[0]*split)
-	train_x = X[:split_boundary]
-	test_x = X[split_boundary:]
-	split_boundary = int(Y.shape[0]*split)
-	train_y = Y[:split_boundary]
-	test_y = Y[split_boundary:]
-	return train_x,train_y,test_x,test_y
+#  @Author:             WangShiling
+#  @Create_date:        2019-04-27 11:54
+#  @Description:        数据处理工具包，提供各种数据处理函数
+#  @Update_date:        2019-04-29 10:21
 
 
+def get_file_lines(filename):
+    """从文件按行加载内容，返回字符串列表str_list=[],保留空行,但首行不允许有空行"""
+    str_list = []
+    df = pd.read_csv(filename, sep='\n', header=None, skip_blank_lines=False)
+    temp = np.array(df).astype(str)
+    for x in temp:
+        if x[0] == 'nan':
+            str_list.append('')
+        else:
+            str_list.append(x[0].strip())
+    return str_list
 
 
+def get_file_skip_blank(filename):
+    """从文件按行加载内容，返回字符串列表str_list=['..',...''],不保留空行"""
+    str_list = []
+    df = pd.read_csv(filename, sep='\n', header=None, skip_blank_lines=True)
+    temp = np.array(df).astype(str)
+    for x in temp:
+        str_list.append(x[0].strip())
+    return str_list
 
 
+def get_variables(str_list):
+    """提取用户自定义变量以及代码中调用的方法名,返回字符串列表variable_list[]"""
+    pattern_list = load_pattern_list()
+    temp = []
+    for data in str_list:
+        if len(data) == 0:
+            continue
+        for pattern in pattern_list:
+            result = pattern.findall(str(data))
+            if result:
+                for rst in result:
+                    temp.append(rst)
+    variable_list = list(set(temp))
+    variable_list.sort(key=temp.index)
+    return variable_list
 
 
+def get_keyword_dict(variable_list):
+    """生成词袋，即对照转换列表，返回有序词典类型code_to_int{},int_to_code{}"""
+    kw_list = get_file_skip_blank('../static/kwlist.txt')
+    for x in variable_list:
+        kw_list.append(x)
+    code_to_int = col.OrderedDict((c, i + 1) for i, c in enumerate(kw_list))
+    int_to_code = col.OrderedDict((i + 1, c) for i, c in enumerate(kw_list))
+    return code_to_int, int_to_code
 
 
+def get_in_matrix(str_list, code_to_int):
+    """将字符串列表根据词典转换为数字矩阵,空格、填充及其他无关紧要字符为0，返回替换后的数字表示in_matrix[[]...[]],每行长度为200"""
+    in_matrix = []
+    for x in str_list:
+        line = split_code_line(x)
+        if len(line) == 1 and line[0] == '':
+            temp = []
+            for i in range(200):
+                temp.append(0)
+            in_matrix.append(temp)
+            continue
+        temp = []
+        for y in line:
+            if len(y) == 0:
+                continue
+            try:
+                temp.append(code_to_int[y])
+            except KeyError:
+                temp_code = split_other(y)
+                for z in temp_code:
+                    if len(z) == 0:
+                        continue
+                    try:
+                        temp.append(code_to_int[z])
+                    except KeyError:
+                        temp.append(0)
+        if len(temp) != 200:
+            for i in range(200 - len(temp)):
+                temp.append(0)
+        in_matrix.append(temp)
+    return in_matrix
 
 
+def get_in_matrix_bin(in_matrix):
+    """将数字表示转换为二进制表示，每词长度为10，每行长度为2000"""
+    return in_matrix
 
 
+def get_input_set(str_list, code_to_int, group_size):
+    """以group_size为最小单位构造输入数据,返回reshape并且归一化后的input_x"""
+    in_matrix = get_in_matrix(str_list, code_to_int)
+    input_x = []
+    if group_size == 1:
+        input_x = in_matrix
+        input_x = np.array(input_x).astype(int)
+        input_x = np.reshape(input_x, (len(input_x), input_x.shape[1], 1))
+    else:
+        for i in range(group_size - 1):
+            temp0 = []
+            for j in range(200):
+                temp0.append(0)
+            in_matrix.append(temp0)
+        for i in range(0, len(in_matrix) - group_size + 1):
+            input_x.append(in_matrix[i:i + group_size])
+        input_x = np.array(input_x).astype(int)
+        input_x = np.reshape(input_x, (len(input_x), input_x.shape[1], input_x.shape[2]))
+    input_x = input_x / len(code_to_int)
+    return input_x
 
 
+def get_out_matrix(filename):
+    """读取输出数据"""
+    temp = get_file_skip_blank(filename)
+    out_matrix = list(np.array(temp).astype(int))
+    return out_matrix
 
 
+def get_output_set(filename, group_size):
+    """以group_size为最小单位构造输出数据,返回reshape并且归一化后的output_y"""
+    out_matrix = get_out_matrix(filename)
+    output_y = []
+    if group_size == 1:
+        output_y = out_matrix
+        output_y = np.array(output_y).astype(int)
+        output_y = np.reshape(output_y, (len(output_y), 1))
+    else:
+        for i in range(group_size - 1):
+            out_matrix.append(-1)
+        for i in range(0, len(out_matrix) - group_size + 1):
+            output_y.append(out_matrix[i:i + group_size])
+        output_y = np.array(output_y).astype(int)
+        output_y = np.reshape(output_y, (len(output_y), output_y.shape[1], 1))
+    return output_y
 
+
+def get_train_data(input_x, output_y, split):
+    """加载模型训练所需数据，将训练集中输入输出按比例拆分"""
+    split_boundary_x = int(input_x.shape[0] * split)
+    split_boundary_y = int(output_y.shape[0] * split)
+    train_x = input_x[:split_boundary_x]
+    test_x = input_x[split_boundary_x:]
+    train_y = output_y[:split_boundary_y]
+    test_y = output_y[split_boundary_y:]
+    return train_x, train_y, test_x, test_y
+
+
+def get_train_data_one_step(in_file, out_file, in_group_size, out_group_size, split):
+    """更加方便的调用，一步得到训练所需数据"""
+    str_list = get_file_lines(in_file)
+    variable_list = get_variables(str_list)
+    code_to_int, int_to_code = get_keyword_dict(variable_list)
+    input_x = get_input_set(str_list, code_to_int, in_group_size)
+    output_y = get_output_set(out_file, out_group_size)
+    return get_train_data(input_x, output_y, split)
+
+
+def code_recover(in_matrix, int_to_code):
+    """由数字表示还原代码"""
+    code = []
+    for x in in_matrix:
+        code_line = []
+        for value in x:
+            if value != 0:
+                code_line.append(int_to_code[value])
+        code.append(' '.join(code_line))
+    return code
+
+
+def load_pattern_list():
+    """加载正则匹配模式列表，返回正则匹配模式对象列表pattern_list[],一般不对外提供，无特殊需求，在外部程序无需调用"""
+    temp = get_file_skip_blank('../static/pattern.txt')
+    pattern_list = []
+    for x in temp:
+        pattern = re.compile(r'' + x + '')
+        pattern_list.append(pattern)
+    return pattern_list
+
+
+def split_code_line(code_line):
+    """拆分每一行代码"""
+    pattern = re.compile(r'([^a-zA-Z0-9]{1,2})')
+    line = []
+    temp = code_line.split(' ')
+    for x in temp:
+        result = re.split(pattern, x)
+        for r in result:
+            line.append(r)
+    return line
+
+
+def split_other(other):
+    """拆分错误分割，即将多个符号分割在一起的情况，如][,])等"""
+    pattern = re.compile(r'([^0-9a-zA-Z\s])')
+    temp = pattern.findall(other)
+    return temp
